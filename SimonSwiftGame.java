@@ -7,25 +7,25 @@ import java.util.Random;
 
 public class SimonSwiftGame {
 	static SwiftBotAPI swiftBot;
-	static Map<String, Button> buttonMap;
-    static Map<String, Underlight> ledMap;
+	static Map<String, Button> buttonMap;	// Maps colors to buttons.
+    static Map<String, Underlight> ledMap;	 // Maps colors to LEDs.
     static List<String> colorSequence;
     static Scanner scanner;
     static int score = 0;
     static int round = 1;
-    static boolean buttonPressed = false;
-    static Button lastPressedButton = null;
+    static boolean buttonPressed = false;	// Tracks if a button is pressed.
+    static Button lastPressedButton = null;	 // Tracks the last button pressed.
     
     public static void main(String[] args) throws InterruptedException{
-    	initialize();
-    	displayIntro();
-    	playGame();
+    	initialize();	// Sets up the robot and game.
+    	displayIntro();	 // Displays game instructions.
+    	playGame();	// Starts the main game loop.
     }
     
     public static void initialize() {
     	try {
     		swiftBot = new SwiftBotAPI();
-    		
+    		 // Enable buttons and set their behaviors.
     		swiftBot.enableButton(Button.A, () -> {
                 System.out.println("Button A Pressed.");
                 lastPressedButton = Button.A;
@@ -49,23 +49,23 @@ public class SimonSwiftGame {
             
     	} catch (Exception e){
     		System.out.println("ups");
-    		System.exit(5);
+    		System.exit(5);	// Exit if initialization fails.
     	}
-    	
+    	// Map colors to buttons.
     	buttonMap= new HashMap<>();
     	buttonMap.put("red", Button.A);
     	buttonMap.put("blue", Button.B);
     	buttonMap.put("green", Button.X);
     	buttonMap.put("white", Button.Y);
-    	
+    	// Map colors to LEDs.
     	ledMap= new HashMap<>();
     	ledMap.put("red", Underlight.FRONT_LEFT);
     	ledMap.put("blue", Underlight.BACK_LEFT);
     	ledMap.put("green", Underlight.FRONT_RIGHT);
     	ledMap.put("white", Underlight.BACK_RIGHT);
     	
-    	colorSequence = new ArrayList<>();
-    	scanner = new Scanner(System.in);	
+    	colorSequence = new ArrayList<>(); // Initializes the color sequence.
+    	scanner = new Scanner(System.in);	// Prepares input scanner.
     }
     
     public static void displayIntro() throws InterruptedException{
@@ -97,7 +97,7 @@ public class SimonSwiftGame {
         Thread.sleep(500);
         System.out.println("Let me know when you are ready by typing 'Y'. I can't wait to play with you!");
         
-        String userInput = scanner.nextLine().toUpperCase();
+        String userInput = scanner.nextLine().toUpperCase();	// Read user input and convert to uppercase.
         if(!userInput.equals("Y")) {
         	System.out.println("Okay! Maybe next time. Exiting the game.");
             System.exit(0);
@@ -106,11 +106,12 @@ public class SimonSwiftGame {
     }
     
     public static void waitForButtonPress(Button expectedButton, String Color) throws InterruptedException{
-    	buttonPressed = false;
-        lastPressedButton = null;
+    	// Waits for the user to press the correct button and lights the corresponding LED.
+    	buttonPressed = false; 	// Reset button press status.
+        lastPressedButton = null; 	// Clear the last button press.
         
         
-    	while (!buttonPressed || lastPressedButton != expectedButton) {
+    	while (!buttonPressed || lastPressedButton != expectedButton) {	// Loop until the correct button is pressed.
     		Thread.sleep(100);
     	}
     	Underlight led = ledMap.get(Color);
@@ -122,8 +123,10 @@ public class SimonSwiftGame {
     public static void clearConsole() {
     	try {
             if (System.getProperty("os.name").contains("Windows")) {
+            	// If running on Windows:
                 new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
             } else {
+            	// If running on macOS/Linux:
                 System.out.print("\033[H\033[2J");
                 System.out.flush();
             }
@@ -132,23 +135,26 @@ public class SimonSwiftGame {
         }
     }
     
-    public static void playGame() throws InterruptedException{
+    public static void playGame() throws InterruptedException{  // Creates a Random object for generating random numbers.
     	Random random = new Random();
     	String[] colors = {"red","blue","green","white"};
     	
-    	while(round<=20) {
+    	while(round<=20) { // Game continues until 20 rounds or player quits.
     		clearConsole();
     		System.out.println("\nRound: " + round + " | Score: " + score);
     		
     		if(round == 1) {
+    			// If it's the first round, generate the first color in the sequence.
                 colorSequence.add(colors[random.nextInt(4)]);
+                // Adds a random color from the array to the sequence.
             } else {
                 colorSequence.add(colors[random.nextInt(4)]);
+                // Adds an additional random color to the sequence for subsequent rounds.
             }
     		
-    		showColorSequence();
+    		showColorSequence();	// Displays the current sequence using LEDs.
     		
-    		if(!getUserInput()) {
+    		if(!getUserInput()) { // Checks if the player's input matches the sequence.
     			System.out.println("Game Over!");
                 break;
     		}
@@ -185,8 +191,8 @@ public class SimonSwiftGame {
     	System.out.println("Press the button for the right colors");
     	for(String color : colorSequence) {
             Button expectedButton = buttonMap.get(color);
-            buttonPressed = false; 
-            lastPressedButton = null;
+            buttonPressed = false; // Reset the button press status.
+            lastPressedButton = null; // Reset the last pressed button.
             
             while(!buttonPressed) {
             	try {
@@ -197,7 +203,9 @@ public class SimonSwiftGame {
             }
             
             if(lastPressedButton != expectedButton) {
+            	// If the wrong button is pressed:
             	return false;
+            	// Return false to indicate a mismatch.
             }
     	}
     	return true;
