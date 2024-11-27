@@ -160,7 +160,6 @@ public class SimonSwiftGame {
     		}
     		
     		score++;
-    		round++;
     		
     		if(round % 5 ==0) {
     			System.out.println("Do you want to continue or quit? (Enter 'c' to continue, 'q' to quit): ");
@@ -170,6 +169,7 @@ public class SimonSwiftGame {
                     break;
                 }
     		}
+    		round++;
     	}
     	
     	endGame();
